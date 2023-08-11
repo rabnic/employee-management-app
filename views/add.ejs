@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="style.css" />
+
+</head>
+
+<body>
+    <%- include('partials/nav.ejs') %>
+
+        <h1>Add New</h1>
+        <div class="container">
+            <div class="cta-form">
+                <h2>Fill out the form!</h2>
+            </div>
+            <form method="post" action="/add" class="form">
+
+                <input type="text" placeholder="Job Title" class="form__input" name="title"  id="title" />
+                <label for="title" class="form__label">Title</label>
+
+                <input type="text" placeholder="Company" class="form__input" name="companyName" id="companyName" />
+                <label for="companyName" class="form__label">Company</label>
+
+                <input type="text" placeholder="Location" class="form__input" name="location" id="location" />
+                <label for="location" class="form__label">Location</label>
+
+                <input type="text" placeholder="Description" class="form__input" name="description" id="description" />
+                <label for="description" class="form__label">Description</label>
+
+                <input type="submit" id="submit" class="form__input" value="Submit">
+
+            </form>
+        </div>
+</body>
+
+</html>
