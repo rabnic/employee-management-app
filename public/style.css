@@ -67,32 +67,22 @@ html body .container .cta-form {
     margin-bottom: 0;
     margin-right: 2rem;
     text-align: left;
+    display: flex;
   }
 }
-html body .container .cta-form h2 {
-  font-size: 1.5rem;
-  width: 100%;
-  max-width: 25ch;
-  margin: 0 auto;
-  text-align: center;
-}
-@media (min-width: 768px) {
-  html body .container .cta-form h2 {
-    text-align: left;
-    margin: 0;
-  }
-}
-html body .container .cta-form p {
-  margin-top: 1rem;
-  font-size: 1rem;
-  width: 100%;
-  max-width: 24ch;
-}
+
 html .form {
   align-self: center;
 }
+
+.cta-form {
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
 html .form__input {
-  width: clamp(120px, 50vw, 420px);
+  width: clamp(220px, 50vw, 420px);
   height: 2.5rem;
   padding: 0 1.25rem;
   border: 1px solid #303030;
@@ -100,6 +90,14 @@ html .form__input {
   margin: 0.625rem auto;
   transition: all 250ms;
 }
+
+form #picture  {
+  border: none;
+  font-size: 1rem;
+  padding: 5px;
+  padding-left: 0;
+}
+
 #submit {
     border-radius: 5px;
     background-color: #28666e;
@@ -107,6 +105,7 @@ html .form__input {
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
+    margin-top: -5px;
 }
 #submit:hover {
     color: #D8DBCE;
@@ -214,13 +213,13 @@ article {
     overflow: hidden;
   }
   
-  article a::after {
+  /* article .actions::after {
     position: absolute;
     inset-block: 0;
     inset-inline: 0;
-    cursor: pointer;
+    border: 1px solid red;
     content: "";
-  }
+  } */
   
   /* basic article elements styling */
   article h2 {
@@ -250,19 +249,19 @@ article {
     padding: 24px;
   }
   
-  article a {
+  /* article .actions {
     display: inline-flex;
     align-items: center;
     text-decoration: none;
     color: #28666e;
-  }
+  } */
   
-  article a:focus {
+  article .actions:focus {
     outline: 1px dotted #28666e;
   }
   
-  article a .icon {
-    min-width: 24px;
+  article .actions .icon {
+    min-width: fit-content;
     width: 24px;
     height: 24px;
     margin-left: 5px;
@@ -270,6 +269,35 @@ article {
     opacity: var(--link-icon-opacity);
     transition: all 0.3s;
   }
+
+  article .actions .icon:hover {
+    cursor: pointer;
+  }
+
+  .icon.delete {
+    color: tomato;
+  }
+
+  .icon {
+    cursor: pointer;
+  }
+
+  .icon.edit {
+    color: green;
+  }
+
+  .icon.more-details {
+    color:royalblue;
+  }
+
+  article .actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 2rem;
+  }
+
+
   
   /* using the has() relational pseudo selector to update our custom properties */
   article:has(:hover, :focus) {
@@ -300,10 +328,6 @@ article {
     gap: 24px;
   }
 
-  article a {
-    display: flex;
-    justify-content: flex-end;
-  }
   
   @media screen and (max-width: 960px) {
     article {

@@ -14,24 +14,35 @@
 <body>
     <%- include('partials/nav.ejs') %>
 
-        <h1>Add New</h1>
+        <h1><%= title %> Employee</h1>
         <div class="container">
             <div class="cta-form">
-                <h2>Fill out the form!</h2>
+                <!-- <h2>Fill out the form!</h2> -->
+                <img src="https://cdn.icon-icons.com/icons2/1572/PNG/512/3592854-add-user-business-man-employee-general-human-member-office_107767.png"
+                    alt="add new employee" width="60%" height="60%" />
             </div>
-            <form method="post" action="/add" class="form">
+            <form method="post" action="/employees" class="form">
 
-                <input type="text" placeholder="Job Title" class="form__input" name="title"  id="title" />
-                <label for="title" class="form__label">Title</label>
+                <input type="text" placeholder="Full Name" class="form__input" name="fullName" id="fullName" >
+                <label for="fullName" class="form__label">Full Name</label>
 
-                <input type="text" placeholder="Company" class="form__input" name="companyName" id="companyName" />
-                <label for="companyName" class="form__label">Company</label>
+                <input type="text" placeholder="ID Number" class="form__input" name="idNumber" id="idNumber" />
+                <label for="idNumber" class="form__label">ID Number</label>
 
-                <input type="text" placeholder="Location" class="form__input" name="location" id="location" />
-                <label for="location" class="form__label">Location</label>
+                <input type="email" placeholder="Email" class="form__input" name="email" id="email" />
+                <label for="email" class="form__label">Email</label>
 
-                <input type="text" placeholder="Description" class="form__input" name="description" id="description" />
-                <label for="description" class="form__label">Description</label>
+                <input type="text" placeholder="Position" class="form__input" name="position" id="position" />
+                <label for="position" class="form__label">Position</label>
+
+                <input type="tel" placeholder="Phone Number" class="form__input" name="phoneNumber" id="phoneNumber" />
+                <label for="phoneNumber" class="form__label">Phone Number</label>
+
+                <div>
+                    <input type="file" placeholder="Select Picture" class="form__input" name="picture" id="picture" />
+                    <label for="picture" class="form__label">Select Picture:</label>
+                </div>
+
 
                 <input type="submit" id="submit" class="form__input" value="Submit">
 
