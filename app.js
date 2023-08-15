@@ -1,49 +1,71 @@
 const express = require('express')
+// const morgan = require('morgan')
+// const multer = require('multer')
+// const uuid = require('uuid-v4');
+const path = require('path');
+
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage: storage });
+
+const admin = require('firebase-admin')
+// const firebase = require('firebase')
+const credentials = require('./key.json')
+
+const dir = __dirname
 const app = express();
-const morgan = require('morgan')
 
-app.listen(3000);
-
+app.use(express.static(path.join(dir, 'public')));
 app.set('view engine', 'ejs');
 app.set('views');
 
-const admin = require('firebase-admin')
-const credentials = require('./key.json')
 
 // Initialize admin
 admin.initializeApp({
     credential: admin.credential.cert(credentials),
+    storageBucket: 'job-site-35d8d.appspot.com'
 })
 
 const db = admin.firestore();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(morgan('common'));
-app.use(express.static('public'))
+// Middleware
 
-// Read data
-async function fetchData(req, res, next) {
+
+
+// Render add employee page with form
+app.get('/add', (req, res) => {
+    res.render('add', { title: 'Add' });
+})
+
+// Update employee 
+app.post('/employees/:id', async (req, res) => {
+    try {
+        const employeeId = req.params.id;
+        const { fullName, idNumber, email, position, phoneNumber } = req.body;
+        await db.collection('employees').doc(employeeId).update({ fullName, idNumber, email, position, phoneNumber });
+        res.redirect('/employees');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred');
+    }
+});
+
+// Get all employees and return them
+app.get('/employees', async (req, res) => {
     try {
         const employeeRef = db.collection('employees');
         const response = await employeeRef.get();
-        const responseData = []
+        const employees = []
         response.forEach((employee) => {
-            responseData.push({...employee.data(), id:employee.id});
+            employees.push({ ...employee.data(), id: employee.id });
         })
-        console.log(responseData);
-        req.body.employees = responseData;
-        next();
+        res.render('index', { employees: employees, title: 'Home' });
     } catch (error) {
         console.log(error.message);
-        next();
     }
-}
-
-app.get('/employees', fetchData, (req, res) => {
-    res.render('index', {employees: req.body.employees, title:'Home'});
 })
-
+// Add a new employee
 app.post('/employees', async (req, res) => {
     console.log('adding employee');
     try {
@@ -53,7 +75,38 @@ app.post('/employees', async (req, res) => {
             email: req.body.email,
             position: req.body.position,
             phoneNumber: req.body.phoneNumber,
-            picture: "No picture",
+        }
+        const file = req.file;
+        console.log(file, 'line 85');
+        if (file) {
+            const storageRef = admin.storage().ref();
+            const fileRef = storageRef.child(file.originalname);
+            fileRef.put(file.buffer)
+            .then(() => {
+                return fileRef.getDownloadURL();
+            })
+            .then((url) => {
+                employee.pictureUrl = url;
+            }).catch((error) => {
+                console.log(error);
+            })
+
+            // const bucket = admin.storage().bucket();
+            // const imageFile = req.files.image;
+
+            // const imageUploadOptions = {
+            //     destination: `employees-images/${employee.idNumber}`,
+            //     metadata: {
+            //         contentType: imageFile.metadata.contentType.mimetype
+            //     }
+            // };
+
+            // await bucket.upload(imageFile.tempFilePath, imageUploadOptions);
+
+
+            // const imageUrl = `https://storage.googleapis.com/${bucket.name}/${imageUploadOptions.destination}`;
+            // employee.imageURL = imageUrl;
+            // console.log(imageUrl);
         }
         const response = await db.collection('employees').add(employee);
         // res.send(response)
@@ -64,8 +117,22 @@ app.post('/employees', async (req, res) => {
     }
 })
 
-// Delete the post
-app.delete('/employees/:id', async(req, res) => {
+// Get employee data and populate form
+app.get('/edit/:id', async (req, res) => {
+    const employeeId = req.params.id;
+    console.log(employeeId);
+    console.log(req.params);
+    const employeeSnapshot = await db.collection('employees').doc(employeeId).get();
+    const employee = { ...employeeSnapshot.data(), id: employeeSnapshot.id }
+    console.log(employee);
+    // res.send(employee);
+    res.render('edit', { employee });
+})
+
+
+
+// Delete an employee
+app.delete('/employees/:id', async (req, res) => {
     console.log('trying to delete employee');
     try {
         const response = await db.collection('employees').doc(req.params.id).delete();
@@ -77,38 +144,13 @@ app.delete('/employees/:id', async(req, res) => {
 })
 
 app.get('/about', (req, res) => {
-    res.render('about', {title:'About'});
-})
-
-app.get('/add', (req, res) => {
-    res.render('add', {title:'Add'});
-})
-
-// Read data
-async function fetchEmployee(req, res, next) {
-    try {
-        const response = await db.collection('employees').doc(req.params.id).get();
-        const employee = {...response.data(), id: response.id}
-        console.log(response);
-        req.body.employee = employee;
-        next();
-    } catch (error) {
-        console.log(error.message);
-        next();
-    }
-}
-
-app.get('/edit/:id',fetchEmployee, (req, res) => {
-    // res.send(req.body.employee);
-    res.render('add', {title:'Edit', employee: req.body.employee});
-})
-
-app.get('/edit', (req, res) => {
-    res.render('add', {title:'Edit', employee: req.body.employee});
+    res.render('about', { title: 'About' });
 })
 
 
-
+// Handle bad requests
 app.use((req, res) => {
-    res.status(200).render('404', {title:'Not Found'});
+    res.status(200).render('404', { title: 'Not Found' });
 })
+
+app.listen(3000);

@@ -5,37 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        Add
+        Edit
     </title>
     <link rel="stylesheet" href="/style.css" />
-
 </head>
 
 <body>
     <%- include('partials/nav.ejs') %>
 
-        <h1>Add Employee</h1>
+        <h1>Edit Employee</h1>
         <div class="container">
             <div class="cta-form">
                 <!-- <h2>Fill out the form!</h2> -->
                 <img src="https://cdn.icon-icons.com/icons2/1572/PNG/512/3592854-add-user-business-man-employee-general-human-member-office_107767.png"
                     alt="add new employee" width="60%" height="60%" />
             </div>
-            <form method="post" action="/employees" class="form" >
+            <form method="POST" action="/employees/<%= employee.id %>" class="form">
 
-                <input type="text" placeholder="Full Name" class="form__input" name="fullName" id="fullName" >
+                <input type="text" placeholder="Full Name" class="form__input" name="fullName" id="fullName" value="<%= employee.fullName %>" >
                 <label for="fullName" class="form__label">Full Name</label>
 
-                <input type="text" placeholder="ID Number" class="form__input" name="idNumber" id="idNumber" />
+                <input type="text" placeholder="ID Number" class="form__input" name="idNumber" id="idNumber" value="<%= employee.idNumber %>" />
                 <label for="idNumber" class="form__label">ID Number</label>
 
-                <input type="email" placeholder="Email" class="form__input" name="email" id="email" />
+                <input type="email" placeholder="Email" class="form__input" name="email" id="email" value="<%= employee.email %>"/>
                 <label for="email" class="form__label">Email</label>
 
-                <input type="text" placeholder="Position" class="form__input" name="position" id="position" />
+                <input type="text" placeholder="Position" class="form__input" name="position" id="position" value="<%= employee.position %>"/>
                 <label for="position" class="form__label">Position</label>
 
-                <input type="tel" placeholder="Phone Number" class="form__input" name="phoneNumber" id="phoneNumber" />
+                <input type="tel" placeholder="Phone Number" class="form__input" name="phoneNumber" id="phoneNumber" value="<%= employee.phoneNumber %>"/>
                 <label for="phoneNumber" class="form__label">Phone Number</label>
 
                 <div>
@@ -48,6 +47,5 @@
 
             </form>
         </div>
-</body>
-
+    </body>
 </html>
