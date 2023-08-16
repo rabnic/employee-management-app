@@ -1,14 +1,12 @@
 const express = require('express')
 // const morgan = require('morgan')
-// const multer = require('multer')
-// const uuid = require('uuid-v4');
+const fs = require('fs')
+const multer = require('multer')
 const path = require('path');
 
-// const storage = multer.memoryStorage();
-// const upload = multer({ storage: storage });
+const upload = multer({ dest: 'uploads/' }).single('picture');
 
 const admin = require('firebase-admin')
-// const firebase = require('firebase')
 const credentials = require('./key.json')
 
 const dir = __dirname
@@ -17,7 +15,6 @@ const app = express();
 app.use(express.static(path.join(dir, 'public')));
 app.set('view engine', 'ejs');
 app.set('views');
-
 
 // Initialize admin
 admin.initializeApp({
@@ -28,9 +25,6 @@ admin.initializeApp({
 const db = admin.firestore();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Middleware
-
 
 
 // Render add employee page with form
@@ -44,12 +38,24 @@ app.post('/employees/:id', async (req, res) => {
         const employeeId = req.params.id;
         const { fullName, idNumber, email, position, phoneNumber } = req.body;
         await db.collection('employees').doc(employeeId).update({ fullName, idNumber, email, position, phoneNumber });
-        res.redirect('/employees');
+        res.redirect(`/employees/${employeeId}`);
     } catch (error) {
         console.error(error);
         res.status(500).send('An error occurred');
     }
 });
+
+// Get employee details and render
+app.get('/employees/:id', async (req, res) => {
+    const employeeId = req.params.id;
+    console.log(employeeId);
+    console.log(req.params);
+    const employeeSnapshot = await db.collection('employees').doc(employeeId).get();
+    const employee = { ...employeeSnapshot.data(), id: employeeSnapshot.id }
+    console.log(employee);
+    // res.send(employee);
+    res.render('details', { employee });
+})
 
 // Get all employees and return them
 app.get('/employees', async (req, res) => {
@@ -66,7 +72,7 @@ app.get('/employees', async (req, res) => {
     }
 })
 // Add a new employee
-app.post('/employees', async (req, res) => {
+app.post('/employees', upload, async (req, res) => {
     console.log('adding employee');
     try {
         const employee = {
@@ -77,36 +83,29 @@ app.post('/employees', async (req, res) => {
             phoneNumber: req.body.phoneNumber,
         }
         const file = req.file;
-        console.log(file, 'line 85');
+        const bucket = admin.storage().bucket();
+        console.log('file: ', file);
         if (file) {
-            const storageRef = admin.storage().ref();
-            const fileRef = storageRef.child(file.originalname);
-            fileRef.put(file.buffer)
-            .then(() => {
-                return fileRef.getDownloadURL();
-            })
-            .then((url) => {
-                employee.pictureUrl = url;
-            }).catch((error) => {
-                console.log(error);
-            })
+            const fileName = `${file.filename}`;
+            const storageRef = admin.storage().bucket();
+            const uploadedFile = await storageRef.upload(file.path, {
+                destination: `images/${fileName}`,
+                metadata: {
+                    contentType: file.mimetype
+                }
 
-            // const bucket = admin.storage().bucket();
-            // const imageFile = req.files.image;
+            });
+ 
+            const url = await uploadedFile[0].getSignedUrl({
+                action: 'read',
+                expires: '12-12-2024',
+            });
+            console.log(url);
+            employee.pictureUrl = url[0];
 
-            // const imageUploadOptions = {
-            //     destination: `employees-images/${employee.idNumber}`,
-            //     metadata: {
-            //         contentType: imageFile.metadata.contentType.mimetype
-            //     }
-            // };
+            // Unlink the file from the local storage
+            fs.unlinkSync(file.path);
 
-            // await bucket.upload(imageFile.tempFilePath, imageUploadOptions);
-
-
-            // const imageUrl = `https://storage.googleapis.com/${bucket.name}/${imageUploadOptions.destination}`;
-            // employee.imageURL = imageUrl;
-            // console.log(imageUrl);
         }
         const response = await db.collection('employees').add(employee);
         // res.send(response)
@@ -116,7 +115,6 @@ app.post('/employees', async (req, res) => {
         res.send(error);
     }
 })
-
 // Get employee data and populate form
 app.get('/edit/:id', async (req, res) => {
     const employeeId = req.params.id;
@@ -128,7 +126,6 @@ app.get('/edit/:id', async (req, res) => {
     // res.send(employee);
     res.render('edit', { employee });
 })
-
 
 
 // Delete an employee
@@ -143,8 +140,8 @@ app.delete('/employees/:id', async (req, res) => {
     }
 })
 
-app.get('/about', (req, res) => {
-    res.render('about', { title: 'About' });
+app.get('/details', (req, res) => {
+    res.render('details', { title: 'Details' });
 })
 
 

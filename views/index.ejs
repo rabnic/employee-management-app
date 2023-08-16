@@ -21,8 +21,10 @@
                     <article>
                         <div class="article-wrapper">
                             <figure>
-                                <img src="https://images.unsplash.com/photo-1635350736475-c8cef4b21906?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-                                    alt="" width="100%" />
+                                <!-- <img src="https://images.unsplash.com/photo-1635350736475-c8cef4b21906?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                                    alt="" width="100%" /> -->
+                                <img src="<%= employee.pictureUrl %>"
+                                    alt="" width="100%" loading="lazy" />
                             </figure>
                             <div class="article-body">
                                 <h2>
@@ -43,7 +45,7 @@
                                 </p>
                                 <br />
                                 <div class="actions">
-                                    <a>
+                                    <a href="/employees/<%= employee.id %>">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                             fill="currentColor" class="icon more-details" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd"

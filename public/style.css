@@ -32,7 +32,7 @@ html body {
  
 }
 html body h1 {
-  font-size: clamp(1rem, 6vw, 10rem);
+  font-size: clamp(1rem, 4vw, 8rem);
   margin: 5vh 0 2rem;
 }
 
@@ -185,7 +185,8 @@ nav {
 }
 nav ul {
     display: flex;
-    gap: 2rem
+    justify-content: center;
+    gap: 3rem;
 }
 nav ul li {
     list-style: none;
@@ -222,7 +223,7 @@ article {
   } */
   
   /* basic article elements styling */
-  article h2 {
+  h2 {
     margin: 0 0 18px 0;
     font-family: "Bebas Neue", cursive;
     font-size: 1.7rem;
@@ -290,7 +291,7 @@ article {
     color:royalblue;
   }
 
-  article .actions {
+  .actions {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -368,3 +369,69 @@ article {
     white-space: nowrap; 
     width: 1px;
   }
+
+/* Employee Details Page */
+
+/* @import url(https://fonts.googleapis.com/css?family=Montserrat:400,700); */
+@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+
+body .card {
+  width: 800px;
+  height: auto;
+  background: transparent;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  /* flex-wrap: wrap; */
+  gap: 1rem;
+  /* border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px; */
+  /* box-shadow: 0px 20px 30px 3px rgba(0, 0, 0, 0.55); */
+}
+body .card_left {
+  width: 40%;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: transparent;
+}
+body .card_left img {
+  width: 300px;
+  height: 300px; 
+  object-fit: cover;
+  border-radius: 909090px;
+  /* border-radius: 10px 0 0 10px;
+  -webkit-border-radius: 10px 0 0 10px;
+  -moz-border-radius: 10px 0 0 10px; */
+}
+body .card_right {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+  height: auto;
+  padding: 1.5rem;
+  /* border-radius: 0 10px 10px 0;
+  -webkit-border-radius: 0 10px 10px 0;
+  -moz-border-radius: 0 10px 10px 0; */
+  box-shadow: 0px 20px 30px 3px rgba(0, 0, 0, 0.55);
+}
+body .card_right h2 {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 1px;
+}
+body .card_right p {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+ 
+}
+
+.card_right .icon{
+  font-size: 1.3rem;
+}
