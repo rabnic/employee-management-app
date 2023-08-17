@@ -31,13 +31,41 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/add', (req, res) => {
     res.render('add', { title: 'Add' });
 })
-
+ 
 // Update employee 
-app.post('/employees/:id', async (req, res) => {
+app.post('/employees/:id',upload, async (req, res) => {
     try {
         const employeeId = req.params.id;
-        const { fullName, idNumber, email, position, phoneNumber } = req.body;
-        await db.collection('employees').doc(employeeId).update({ fullName, idNumber, email, position, phoneNumber });
+        const { fullName, idNumber, email, position, phoneNumber, pictureUrl } = req.body;
+
+        const file = req.file;
+        const bucket = admin.storage().bucket();
+        // console.log('file: ', file);
+        if (file) {
+            const fileName = `${file.filename}`;
+            const storageRef = admin.storage().bucket();
+            const uploadedFile = await storageRef.upload(file.path, {
+                destination: `images/${fileName}`,
+                metadata: {
+                    contentType: file.mimetype
+                }
+ 
+            }); 
+ 
+            const url = await uploadedFile[0].getSignedUrl({
+                action: 'read',
+                expires: '12-12-2024',
+            });
+            // console.log(url);
+            const pictureUrl = url[0];
+
+            // Unlink the file from the local storage
+            fs.unlinkSync(file.path);
+            await db.collection('employees').doc(employeeId).update({ fullName, idNumber, email, position, phoneNumber, pictureUrl });
+
+        } else {
+            await db.collection('employees').doc(employeeId).update({ fullName, idNumber, email, position, phoneNumber });
+        }
         res.redirect(`/employees/${employeeId}`);
     } catch (error) {
         console.error(error);
@@ -48,11 +76,11 @@ app.post('/employees/:id', async (req, res) => {
 // Get employee details and render
 app.get('/employees/:id', async (req, res) => {
     const employeeId = req.params.id;
-    console.log(employeeId);
-    console.log(req.params);
+    // console.log(employeeId);
+    // console.log(req.params);
     const employeeSnapshot = await db.collection('employees').doc(employeeId).get();
     const employee = { ...employeeSnapshot.data(), id: employeeSnapshot.id }
-    console.log(employee);
+    // console.log(employee);
     // res.send(employee);
     res.render('details', { employee });
 })
@@ -99,8 +127,7 @@ app.post('/employees', upload, async (req, res) => {
             phoneNumber: req.body.phoneNumber,
         }
         const file = req.file;
-        const bucket = admin.storage().bucket();
-        console.log('file: ', file);
+        // console.log('file: ', file);
         if (file) {
             const fileName = `${file.filename}`;
             const storageRef = admin.storage().bucket();
@@ -116,13 +143,14 @@ app.post('/employees', upload, async (req, res) => {
                 action: 'read',
                 expires: '12-12-2024',
             });
-            console.log(url);
+            // console.log(url);
             employee.pictureUrl = url[0];
 
             // Unlink the file from the local storage
             fs.unlinkSync(file.path);
 
         }
+        
         const response = await db.collection('employees').add(employee);
         // res.send(response)
         res.redirect('/employees')
@@ -134,11 +162,11 @@ app.post('/employees', upload, async (req, res) => {
 // Get employee data and populate form
 app.get('/edit/:id', async (req, res) => {
     const employeeId = req.params.id;
-    console.log(employeeId);
+    // console.log(employeeId);
     console.log(req.params);
     const employeeSnapshot = await db.collection('employees').doc(employeeId).get();
     const employee = { ...employeeSnapshot.data(), id: employeeSnapshot.id }
-    console.log(employee);
+    // console.log(employee);
     // res.send(employee);
     res.render('edit', { employee });
 })
@@ -148,6 +176,7 @@ app.get('/edit/:id', async (req, res) => {
 app.delete('/employees/:id', async (req, res) => {
     console.log('trying to delete employee');
     try {
+        
         const response = await db.collection('employees').doc(req.params.id).delete();
         console.log('Delete successful');
     } catch (error) {
