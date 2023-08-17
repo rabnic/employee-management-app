@@ -58,6 +58,21 @@ app.get('/employees/:id', async (req, res) => {
 })
 
 // Get all employees and return them
+app.get('/', async (req, res) => {
+    try {
+        const employeeRef = db.collection('employees');
+        const response = await employeeRef.get();
+        const employees = []
+        response.forEach((employee) => {
+            employees.push({ ...employee.data(), id: employee.id });
+        })
+        res.render('index', { employees: employees, title: 'Home' });
+    } catch (error) {
+        console.log(error.message);
+    }
+})
+
+// Get all employees and return them
 app.get('/employees', async (req, res) => {
     try {
         const employeeRef = db.collection('employees');
@@ -71,6 +86,7 @@ app.get('/employees', async (req, res) => {
         console.log(error.message);
     }
 })
+
 // Add a new employee
 app.post('/employees', upload, async (req, res) => {
     console.log('adding employee');
